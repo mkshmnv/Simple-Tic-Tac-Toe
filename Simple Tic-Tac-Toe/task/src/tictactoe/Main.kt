@@ -65,6 +65,61 @@ fun makeMove(move: String) {
     }
 }
 
+fun analyzeGame(input: String) {
+
+    // Checking winner X or O
+    fun win(c: Char): Boolean {
+        return when ("$c$c$c") {
+            // check winner first row
+            input.substring(0, 3) -> true
+            // check winner second row
+            input.substring(3, 6) -> true
+            // check winner third row
+            input.substring(6, 9) -> true
+            // X12X45X78 - check winner first column
+            "${input[0]}${input[3]}${input[6]}" -> true
+            // 01X34X67X - check winner second column
+            "${input[1]}${input[4]}${input[7]}" -> true
+            // 01X34X67X - check winner third column
+            "${input[2]}${input[5]}${input[8]}" -> true
+            // 01X3X5X78 - check winner first diagonal row
+            "${input[2]}${input[4]}${input[6]}" -> true
+            // X123X567X - check winner second diagonal row
+            "${input[0]}${input[4]}${input[8]}" -> true
+            else -> false
+        }
+    }
+
+    // Checking quantity chars on input string
+    fun checkQty(): Boolean {
+        val qtyX = input.filter { it == Cells.CELL_X.getCell() }.length
+        val qtyO = input.filter { it == Cells.CELL_O.getCell() }.length
+        return qtyX - qtyO in 0..1 || qtyO - qtyX in 0..1
+    }
+
+    println(
+        when {
+//            Grid has three X’s in a row as well as three O’s in a row
+//            Or there are a lot more X's than O's or vice versa
+//            (the difference should be 1 or 0; if the difference is 2 or more, then the game state is impossible).
+            win(Cells.CELL_X.getCell()) && win(Cells.CELL_O.getCell()) || !checkQty() -> "Impossible"
+
+//            Grid has three X’s in a row (including diagonals)
+            win(Cells.CELL_X.getCell()) -> "X wins"
+
+//            Grid has three O’s in a row (including diagonals)
+            win(Cells.CELL_O.getCell()) -> "O wins"
+
+//            Side has a three in a row and the grid has no empty cells
+            !input.contains(Cells.EMPTY.getCell()) -> "Draw"
+
+//            Side has three in a row but the grid still has empty cells
+            input.contains(Cells.EMPTY.getCell()) -> "Game not finished"
+            else -> "Error"
+        }
+    )
+}
+
 // Print currently field
 fun printField(input: String) {
     var x = input

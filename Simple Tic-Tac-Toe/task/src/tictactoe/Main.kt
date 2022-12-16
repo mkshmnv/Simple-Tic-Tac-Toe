@@ -1,70 +1,81 @@
 package tictactoe
 
-
-const val ROWS = 3
-const val COLUMNS = 3
-
-enum class Cells(private val type: String) {
-    EMPTY("_"),
-    CELL_X("X"),
-    CELL_O("O");
+enum class Cells(private val type: Char) {
+    EMPTY('_'),
+    CELL_X('X'),
+    CELL_O('O');
     fun getCell() = type
 }
 
-//const val EMPTY = "_"
-//const val CELL_X = "X"
-//const val CELL_O = "O"
-
 var FIELD = ""
-var MOVE = ""
 
 fun main() {
     FIELD = readln()
-    start(FIELD)
+    printField(FIELD)
+    makeMove(readln())
 }
 
 // Begin game
 fun start(field: String) {
-    while (FIELD.contains(Cells.EMPTY.getCell())) {
+//    while (FIELD.contains(Cells.EMPTY.getCell())) {
         printField(field)
 //        analyzeGame(field)
         makeMove(readln())
-    }
+//    }
 }
 
 fun makeMove(move: String) {
+    var x = 0
+    var y = 0
 
-    val x = move[0].digitToInt()
-    val y = move[2].digitToInt()
+    fun turnMove(cell: Char) {
+        fun coordinates() {
+            println("Coordinates should be from 1 to 3!")
+            makeMove(readln())
+        }
 
-    val error = "This cell is occupied! Choose another one!"
+        fun changeString(index: Int) {
+            if (FIELD[index] == Cells.EMPTY.getCell()) {
+                FIELD = StringBuilder(FIELD).also { it.setCharAt(index, cell) }.toString()
+                printField(FIELD)
+            } else {
+                println("This cell is occupied! Choose another one!")
+                makeMove(readln())
+            }
+        }
 
-    val field = FIELD.split(" ").toMutableList()
-
-    fun turnMove(type: String) {
         when {
-            (move.toIntOrNull() == null) -> println("You should enter numbers!")
-            (x == 1 && y == 1) -> if (field[0] != Cells.EMPTY.getCell()) field[0] = type else println(error)
-            (x == 1 && y == 2) -> if (field[1] != Cells.EMPTY.getCell()) field[1] = type else println(error)
-            (x == 1 && y == 3) -> if (field[2] != Cells.EMPTY.getCell()) field[2] = type else println(error)
-            (x == 2 && y == 1) -> if (field[3] != Cells.EMPTY.getCell()) field[3] = type else println(error)
-            (x == 2 && y == 2) -> if (field[4] != Cells.EMPTY.getCell()) field[4] = type else println(error)
-            (x == 2 && y == 3) -> if (field[5] != Cells.EMPTY.getCell()) field[5] = type else println(error)
-            (x == 3 && y == 1) -> if (field[6] != Cells.EMPTY.getCell()) field[6] = type else println(error)
-            (x == 3 && y == 2) -> if (field[7] != Cells.EMPTY.getCell()) field[7] = type else println(error)
-            (x == 3 && y == 3) -> if (field[8] != Cells.EMPTY.getCell()) field[8] = type else println(error)
+            (x !in 1..3 || y !in 1..3) -> coordinates()
+            x == 1 && y == 1 -> changeString(0)
+            x == 1 && y == 2 -> changeString(1)
+            x == 1 && y == 3 -> changeString(2)
+            x == 2 && y == 1 -> changeString(3)
+            x == 2 && y == 2 -> changeString(4)
+            x == 2 && y == 3 -> changeString(5)
+            x == 3 && y == 1 -> changeString(6)
+            x == 3 && y == 2 -> changeString(7)
+            x == 3 && y == 3 -> changeString(8)
         }
     }
-//    (1, 1) (1, 2) (1, 3)
-//    (2, 1) (2, 2) (2, 3)
-//    (3, 1) (3, 2) (3, 3)
+
+    if (move[0].isDigit() && move[2].isDigit()) {
+        x = move[0].digitToInt()
+        y = move[2].digitToInt()
+        turnMove(Cells.CELL_X.getCell())
+    } else {
+        println("You should enter numbers!")
+        makeMove(readln())
+    }
+
+//    if (FIELD.contains(Cells.EMPTY.getCell())) start(FIELD)
+
 }
 
 // Analyze game state and print it
 fun analyzeGame(input: String) {
 
     // Checking winner X or O
-    fun win(c: String): Boolean {
+    fun win(c: Char): Boolean {
         return when ("$c$c$c") {
             // check winner first row
             input.substring(0, 3) -> true
@@ -88,8 +99,8 @@ fun analyzeGame(input: String) {
 
     // Checking quantity chars on input string
     fun checkQty(): Boolean {
-        val qtyX = input.filter { it.toString() == Cells.CELL_X.getCell() }.length
-        val qtyO = input.filter { it.toString() == Cells.CELL_O.getCell() }.length
+        val qtyX = input.filter { it == Cells.CELL_X.getCell() }.length
+        val qtyO = input.filter { it == Cells.CELL_O.getCell() }.length
         return qtyX - qtyO in 0..1 || qtyO - qtyX in 0..1
     }
 
@@ -119,9 +130,9 @@ fun analyzeGame(input: String) {
 fun printField(input: String) {
     var x = input
     println("---------")
-    repeat(ROWS) {
-        print("| ${x.substring(0, COLUMNS).toList().joinToString(" ")} |")
-        x = x.removeRange(0, COLUMNS)
+    repeat(3) {
+        println("| ${x.substring(0, 3).toList().joinToString(" ")} |")
+        x = x.removeRange(0, 3)
     }
     println("---------")
 }

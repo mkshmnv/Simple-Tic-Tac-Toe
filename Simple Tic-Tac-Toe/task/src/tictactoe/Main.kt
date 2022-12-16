@@ -11,15 +11,49 @@ const val CELL_O = "O"
 const val BORDER_HORIZONTAL = "---------"
 const val BORDER_VERTICAL = "|"
 
+var FIELD = ""
+var MOVE = ""
+
 fun main() {
-    start()
+    FIELD = readln()
+    start(FIELD)
 }
 
 // Begin game
-fun start() {
-    val input = readln()
-    printField(input)
-    analyzeGame(input)
+fun start(field: String) {
+    while (FIELD.contains(EMPTY)) {
+        printField(field)
+//        analyzeGame(field)
+        makeMove(readln())
+    }
+}
+
+fun makeMove(move: String) {
+
+    val x = move[0].digitToInt()
+    val y = move[2].digitToInt()
+
+    val error = "This cell is occupied! Choose another one!"
+
+    val field = FIELD.split(" ").toMutableList()
+
+    fun turnMove(type: String) {
+        when {
+            (move.toIntOrNull() == null) -> println("You should enter numbers!")
+            (x == 1 && y == 1) -> if (field[0] != EMPTY) field[0] = type else println(error)
+            (x == 1 && y == 2) -> if (field[1] != EMPTY) field[1] = type else println(error)
+            (x == 1 && y == 3) -> if (field[2] != EMPTY) field[2] = type else println(error)
+            (x == 2 && y == 1) -> if (field[3] != EMPTY) field[3] = type else println(error)
+            (x == 2 && y == 2) -> if (field[4] != EMPTY) field[4] = type else println(error)
+            (x == 2 && y == 3) -> if (field[5] != EMPTY) field[5] = type else println(error)
+            (x == 3 && y == 1) -> if (field[6] != EMPTY) field[6] = type else println(error)
+            (x == 3 && y == 2) -> if (field[7] != EMPTY) field[7] = type else println(error)
+            (x == 3 && y == 3) -> if (field[8] != EMPTY) field[8] = type else println(error)
+        }
+    }
+//    (1, 1) (1, 2) (1, 3)
+//    (2, 1) (2, 2) (2, 3)
+//    (3, 1) (3, 2) (3, 3)
 }
 
 // Analyze game state and print it

@@ -1,47 +1,67 @@
 package tictactoe
 
+// Enum with game marks
 enum class Cells(private val type: Char) {
     EMPTY('_'),
     CELL_X('X'),
     CELL_O('O');
+
     fun getCell() = type
 }
 
-// Keep field in string
-var FIELD = "_________"
+// Global const
+var FIELD = "_________" // Keep field in string
+var PLAYER = Cells.CELL_X.getCell() // Player in game
+var END_GAME = false // Status of game
 
 fun main() {
-    FIELD = readln()
-    printField(FIELD)
-    makeMove(readln())
+    while (!END_GAME) {
+        printField()
+        makeMove()
+    }
 }
 
-fun makeMove(move: String) {
+// Switch currently player - X or O, start X
+fun nextPlayer() {
+    PLAYER = if (PLAYER == Cells.CELL_X.getCell()) {
+        Cells.CELL_O.getCell()
+    } else {
+        Cells.CELL_X.getCell()
+    }
+}
+
+fun makeMove() {
+    // Check game over?
+    if (END_GAME) return
+
+    // Input player turn
+    val move = readln()
     var x = 0
     var y = 0
 
     fun turnMove(cell: Char) {
-
-        // Check in ranges
+        // Check turn in range
         fun coordinates() {
             println("Coordinates should be from 1 to 3!")
-            makeMove(readln())
+            makeMove()
         }
 
-        // Change currently cell
+        // Change currently cell, pick X or O
         fun changeString(index: Int) {
             if (FIELD[index] == Cells.EMPTY.getCell()) {
                 FIELD = StringBuilder(FIELD).also { it.setCharAt(index, cell) }.toString()
-                printField(FIELD)
+                printField()
             } else {
                 println("This cell is occupied! Choose another one!")
-                makeMove(readln())
+                if (!END_GAME) {
+                    makeMove()
+                }
             }
         }
 
         // Implement changes cell in field
         when {
-            (x !in 1..3 || y !in 1..3) -> coordinates()
+            x !in 1..3 || y !in 1..3 -> coordinates()
             x == 1 && y == 1 -> changeString(0)
             x == 1 && y == 2 -> changeString(1)
             x == 1 && y == 3 -> changeString(2)
@@ -58,75 +78,65 @@ fun makeMove(move: String) {
     if (move[0].isDigit() && move[2].isDigit()) {
         x = move[0].digitToInt()
         y = move[2].digitToInt()
-        turnMove(Cells.CELL_X.getCell())
+        turnMove(PLAYER)
     } else {
         println("You should enter numbers!")
-        makeMove(readln())
+        makeMove()
     }
+
+    analyzeGame()
+    nextPlayer()
 }
 
-fun analyzeGame(input: String) {
+fun analyzeGame() {
 
     // Checking winner X or O
     fun win(c: Char): Boolean {
         return when ("$c$c$c") {
             // check winner first row
-            input.substring(0, 3) -> true
+            FIELD.substring(0, 3) -> true
             // check winner second row
-            input.substring(3, 6) -> true
+            FIELD.substring(3, 6) -> true
             // check winner third row
-            input.substring(6, 9) -> true
+            FIELD.substring(6, 9) -> true
             // X12X45X78 - check winner first column
-            "${input[0]}${input[3]}${input[6]}" -> true
+            "${FIELD[0]}${FIELD[3]}${FIELD[6]}" -> true
             // 01X34X67X - check winner second column
-            "${input[1]}${input[4]}${input[7]}" -> true
+            "${FIELD[1]}${FIELD[4]}${FIELD[7]}" -> true
             // 01X34X67X - check winner third column
-            "${input[2]}${input[5]}${input[8]}" -> true
+            "${FIELD[2]}${FIELD[5]}${FIELD[8]}" -> true
             // 01X3X5X78 - check winner first diagonal row
-            "${input[2]}${input[4]}${input[6]}" -> true
+            "${FIELD[2]}${FIELD[4]}${FIELD[6]}" -> true
             // X123X567X - check winner second diagonal row
-            "${input[0]}${input[4]}${input[8]}" -> true
+            "${FIELD[0]}${FIELD[4]}${FIELD[8]}" -> true
             else -> false
         }
     }
 
-    // Checking quantity chars on input string
-    fun checkQty(): Boolean {
-        val qtyX = input.filter { it == Cells.CELL_X.getCell() }.length
-        val qtyO = input.filter { it == Cells.CELL_O.getCell() }.length
-        return qtyX - qtyO in 0..1 || qtyO - qtyX in 0..1
+    // Switch state ending game
+    fun endGame(result: String) {
+        println(result)
+        END_GAME = true
     }
 
-    println(
-        when {
-//            Grid has three X’s in a row as well as three O’s in a row
-//            Or there are a lot more X's than O's or vice versa
-//            (the difference should be 1 or 0; if the difference is 2 or more, then the game state is impossible).
-            win(Cells.CELL_X.getCell()) && win(Cells.CELL_O.getCell()) || !checkQty() -> "Impossible"
+    // Check result game
+    when {
+        win(Cells.CELL_X.getCell()) -> endGame("X wins")
+        win(Cells.CELL_O.getCell()) -> endGame("O wins")
+        !FIELD.contains(Cells.EMPTY.getCell()) -> endGame("Draw")
+    }
 
-//            Grid has three X’s in a row (including diagonals)
-            win(Cells.CELL_X.getCell()) -> "X wins"
-
-//            Grid has three O’s in a row (including diagonals)
-            win(Cells.CELL_O.getCell()) -> "O wins"
-
-//            Side has a three in a row and the grid has no empty cells
-            !input.contains(Cells.EMPTY.getCell()) -> "Draw"
-
-//            Side has three in a row but the grid still has empty cells
-            input.contains(Cells.EMPTY.getCell()) -> "Game not finished"
-            else -> "Error"
-        }
-    )
+    // Repeat if game go on
+    makeMove()
 }
 
 // Print currently field
-fun printField(input: String) {
-    var x = input
+fun printField() {
+    var tempField = FIELD
     println("---------")
     repeat(3) {
-        println("| ${x.substring(0, 3).toList().joinToString(" ")} |")
-        x = x.removeRange(0, 3)
+        println("| ${tempField.substring(0, 3).toList().joinToString(" ")} |")
+        tempField = tempField.removeRange(0, 3)
     }
     println("---------")
 }

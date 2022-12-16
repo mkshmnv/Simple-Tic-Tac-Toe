@@ -4,12 +4,16 @@ package tictactoe
 const val ROWS = 3
 const val COLUMNS = 3
 
-const val EMPTY = "_"
-const val CELL_X = "X"
-const val CELL_O = "O"
+enum class Cells(private val type: String) {
+    EMPTY("_"),
+    CELL_X("X"),
+    CELL_O("O");
+    fun getCell() = type
+}
 
-const val BORDER_HORIZONTAL = "---------"
-const val BORDER_VERTICAL = "|"
+//const val EMPTY = "_"
+//const val CELL_X = "X"
+//const val CELL_O = "O"
 
 var FIELD = ""
 var MOVE = ""
@@ -21,7 +25,7 @@ fun main() {
 
 // Begin game
 fun start(field: String) {
-    while (FIELD.contains(EMPTY)) {
+    while (FIELD.contains(Cells.EMPTY.getCell())) {
         printField(field)
 //        analyzeGame(field)
         makeMove(readln())
@@ -40,15 +44,15 @@ fun makeMove(move: String) {
     fun turnMove(type: String) {
         when {
             (move.toIntOrNull() == null) -> println("You should enter numbers!")
-            (x == 1 && y == 1) -> if (field[0] != EMPTY) field[0] = type else println(error)
-            (x == 1 && y == 2) -> if (field[1] != EMPTY) field[1] = type else println(error)
-            (x == 1 && y == 3) -> if (field[2] != EMPTY) field[2] = type else println(error)
-            (x == 2 && y == 1) -> if (field[3] != EMPTY) field[3] = type else println(error)
-            (x == 2 && y == 2) -> if (field[4] != EMPTY) field[4] = type else println(error)
-            (x == 2 && y == 3) -> if (field[5] != EMPTY) field[5] = type else println(error)
-            (x == 3 && y == 1) -> if (field[6] != EMPTY) field[6] = type else println(error)
-            (x == 3 && y == 2) -> if (field[7] != EMPTY) field[7] = type else println(error)
-            (x == 3 && y == 3) -> if (field[8] != EMPTY) field[8] = type else println(error)
+            (x == 1 && y == 1) -> if (field[0] != Cells.EMPTY.getCell()) field[0] = type else println(error)
+            (x == 1 && y == 2) -> if (field[1] != Cells.EMPTY.getCell()) field[1] = type else println(error)
+            (x == 1 && y == 3) -> if (field[2] != Cells.EMPTY.getCell()) field[2] = type else println(error)
+            (x == 2 && y == 1) -> if (field[3] != Cells.EMPTY.getCell()) field[3] = type else println(error)
+            (x == 2 && y == 2) -> if (field[4] != Cells.EMPTY.getCell()) field[4] = type else println(error)
+            (x == 2 && y == 3) -> if (field[5] != Cells.EMPTY.getCell()) field[5] = type else println(error)
+            (x == 3 && y == 1) -> if (field[6] != Cells.EMPTY.getCell()) field[6] = type else println(error)
+            (x == 3 && y == 2) -> if (field[7] != Cells.EMPTY.getCell()) field[7] = type else println(error)
+            (x == 3 && y == 3) -> if (field[8] != Cells.EMPTY.getCell()) field[8] = type else println(error)
         }
     }
 //    (1, 1) (1, 2) (1, 3)
@@ -84,8 +88,8 @@ fun analyzeGame(input: String) {
 
     // Checking quantity chars on input string
     fun checkQty(): Boolean {
-        val qtyX = input.filter { it.toString() == CELL_X }.length
-        val qtyO = input.filter { it.toString() == CELL_O }.length
+        val qtyX = input.filter { it.toString() == Cells.CELL_X.getCell() }.length
+        val qtyO = input.filter { it.toString() == Cells.CELL_O.getCell() }.length
         return qtyX - qtyO in 0..1 || qtyO - qtyX in 0..1
     }
 
@@ -94,19 +98,19 @@ fun analyzeGame(input: String) {
 //            Grid has three X’s in a row as well as three O’s in a row
 //            Or there are a lot more X's than O's or vice versa
 //            (the difference should be 1 or 0; if the difference is 2 or more, then the game state is impossible).
-            win(CELL_X) && win(CELL_O) || !checkQty() -> "Impossible"
+            win(Cells.CELL_X.getCell()) && win(Cells.CELL_O.getCell()) || !checkQty() -> "Impossible"
 
 //            Grid has three X’s in a row (including diagonals)
-            win(CELL_X) -> "X wins"
+            win(Cells.CELL_X.getCell()) -> "X wins"
 
 //            Grid has three O’s in a row (including diagonals)
-            win(CELL_O) -> "O wins"
+            win(Cells.CELL_O.getCell()) -> "O wins"
 
 //            Side has a three in a row and the grid has no empty cells
-            !input.contains(EMPTY) -> "Draw"
+            !input.contains(Cells.EMPTY.getCell()) -> "Draw"
 
 //            Side has three in a row but the grid still has empty cells
-            input.contains(EMPTY) -> "Game not finished"
+            input.contains(Cells.EMPTY.getCell()) -> "Game not finished"
             else -> "Error"
         }
     )
@@ -114,10 +118,10 @@ fun analyzeGame(input: String) {
 
 fun printField(input: String) {
     var x = input
-    println(BORDER_HORIZONTAL)
+    println("---------")
     repeat(ROWS) {
-        print("$BORDER_VERTICAL ${x.substring(0, COLUMNS).toList().joinToString(" ")} $BORDER_VERTICAL\n")
+        print("| ${x.substring(0, COLUMNS).toList().joinToString(" ")} |")
         x = x.removeRange(0, COLUMNS)
     }
-    println(BORDER_HORIZONTAL)
+    println("---------")
 }
